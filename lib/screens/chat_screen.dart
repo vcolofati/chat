@@ -26,7 +26,11 @@ class ChatScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () {},
+        onPressed: () {
+          chats.add({
+            'text': 'Adicionado manualmente!',
+          });
+        },
       ),
     );
   }
