@@ -1,3 +1,4 @@
+import 'package:chat/models/auth_data.dart';
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
@@ -6,6 +7,19 @@ class AuthForm extends StatefulWidget {
 }
 
 class _AuthFormState extends State<AuthForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  final AuthData _authData = AuthData();
+
+  _submit() {
+    bool isValid = _formKey.currentState!.validate();
+    FocusScope.of(context).unfocus();
+
+    if (isValid) {
+      print(_authData.getName);
+      print(_authData.getEmail);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -15,32 +29,63 @@ class _AuthFormState extends State<AuthForm> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Form(
+              key: _formKey,
               child: Column(
                 children: [
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Nome',
+                  if (_authData.isSignup)
+                    TextFormField(
+                      key: ValueKey('name'),
+                      initialValue: _authData.getName,
+                      decoration: InputDecoration(
+                        labelText: 'Nome',
+                      ),
+                      onChanged: (String? value) => _authData.setName = value,
+                      validator: (value) {
+                        if (value == '') {
+                          return 'Name can\'t be null';
+                        }
+                        return null;
+                      },
                     ),
-                  ),
                   TextFormField(
+                    key: ValueKey('email'),
                     decoration: InputDecoration(
                       labelText: 'Email',
                     ),
+                    onChanged: (String? value) => _authData.setEmail = value,
+                    validator: (value) {
+                      if (value == null || !value.contains('@')) {
+                        return 'Email can\'t be null or not valid';
+                      }
+                      return null;
+                    },
                   ),
                   TextFormField(
+                    key: ValueKey('password'),
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Senha',
                     ),
+                    onChanged: (String? value) => _authData.setPassword = value,
+                    validator: (value) {
+                      if (value == null || value.trim().length < 7) {
+                        return 'Password can\'t have less than 7 characters';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
-                    child: Text('Entrar'),
-                    onPressed: () {},
+                    child: Text(_authData.isLogin ? 'Entrar' : 'Cadastrar'),
+                    onPressed: _submit,
                   ),
                   TextButton(
-                    child: Text('Criar uma nova conta?'),
-                    onPressed: () {},
+                    child: Text(_authData.isLogin ? 'Signup' : 'Signin'),
+                    onPressed: () {
+                      setState(() {
+                        _authData.toggleMode();
+                      });
+                    },
                   ),
                 ],
               ),
