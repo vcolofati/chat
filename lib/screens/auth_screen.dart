@@ -31,6 +31,7 @@ class _AuthScreenState extends State<AuthScreen> {
           email: authData.getEmail!.trim(),
           password: authData.getPassword!,
         );
+        userCredential.user?.updateProfile(displayName: authData.getName);
 
         final userData = {
           'name': authData.getName,
