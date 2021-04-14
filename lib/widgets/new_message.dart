@@ -11,6 +11,13 @@ class _NewMessageState extends State<NewMessage> {
   final _controller = TextEditingController();
   String _enteredMessage = '';
 
+  //dispose do controlador de texto quando termina o ciclo de vida do componente
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   void _sendMessage() {
     FocusScope.of(context).unfocus();
     final user = FirebaseAuth.instance.currentUser;

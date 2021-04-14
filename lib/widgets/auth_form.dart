@@ -1,4 +1,5 @@
 import 'package:chat/models/auth_data.dart';
+import 'package:chat/widgets/user_image_picker.dart';
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
@@ -23,6 +24,26 @@ class _AuthFormState extends State<AuthForm> {
     }
   }
 
+  List<Widget> _createUserFields() {
+    return [
+      UserImagePicker(),
+      TextFormField(
+        key: ValueKey('name'),
+        initialValue: _authData.getName,
+        decoration: InputDecoration(
+          labelText: 'Nome',
+        ),
+        onChanged: (String? value) => _authData.setName = value,
+        validator: (value) {
+          if (value == '') {
+            return 'Name can\'t be null';
+          }
+          return null;
+        },
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -35,21 +56,7 @@ class _AuthFormState extends State<AuthForm> {
               key: _formKey,
               child: Column(
                 children: [
-                  if (_authData.isSignup)
-                    TextFormField(
-                      key: ValueKey('name'),
-                      initialValue: _authData.getName,
-                      decoration: InputDecoration(
-                        labelText: 'Nome',
-                      ),
-                      onChanged: (String? value) => _authData.setName = value,
-                      validator: (value) {
-                        if (value == '') {
-                          return 'Name can\'t be null';
-                        }
-                        return null;
-                      },
-                    ),
+                  if (_authData.isSignup) ..._createUserFields(),
                   TextFormField(
                     key: ValueKey('email'),
                     decoration: InputDecoration(

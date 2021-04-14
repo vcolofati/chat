@@ -76,7 +76,8 @@ class _AuthScreenState extends State<AuthScreen> {
                     child: Container(
                       margin: const EdgeInsets.all(20),
                       decoration: const BoxDecoration(
-                          color: Color.fromRGBO(0, 0, 0, 0.5)),
+                        color: Color.fromRGBO(0, 0, 0, 0.5),
+                      ),
                       child: const Center(
                         child: CircularProgressIndicator(),
                       ),
