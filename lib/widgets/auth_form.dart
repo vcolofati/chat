@@ -76,7 +76,7 @@ class _AuthFormState extends State<AuthForm> {
                   TextFormField(
                     key: ValueKey('email'),
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText: 'E-mail',
                     ),
                     onChanged: (String? value) => _authData.email = value,
                     validator: (value) {

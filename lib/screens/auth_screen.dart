@@ -1,6 +1,5 @@
 import 'package:chat/models/auth_data.dart';
 import 'package:chat/widgets/auth_form.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +37,11 @@ class _AuthScreenState extends State<AuthScreen> {
             .child('user_images')
             .child('${userCredential.user?.uid}.jpg');
 
-        ref.putFile(authData.image!);
+        final metadata = SettableMetadata(
+          contentType: 'image/jpeg',
+        );
+
+        ref.putFile(authData.image!, metadata);
         final String url = await ref.getDownloadURL();
 
         userCredential.user?.updateProfile(
