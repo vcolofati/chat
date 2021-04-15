@@ -5,6 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UserImagePicker extends StatefulWidget {
+  final Function(File pickedImage) onImagePick;
+
+  UserImagePicker(this.onImagePick);
+
   @override
   _UserImagePickerState createState() => _UserImagePickerState();
 }
@@ -19,15 +23,18 @@ class _UserImagePickerState extends State<UserImagePicker> {
     try {
       pickedFile = await picker.getImage(
         source: ImageSource.camera,
+        imageQuality: 50,
+        maxWidth: 150,
       );
 
-      setState(() {
-        if (pickedFile != null) {
-          _image = File(pickedFile.path);
-        } else {
-          print('No image selected');
-        }
-      });
+      if (pickedFile != null) {
+        setState(() {
+          _image = File(pickedFile!.path);
+        });
+        widget.onImagePick(_image!);
+      } else {
+        print('No image selected');
+      }
     } on PlatformException catch (err) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(err.message!)));

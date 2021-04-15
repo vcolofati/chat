@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chat/models/auth_data.dart';
 import 'package:chat/widgets/user_image_picker.dart';
 import 'package:flutter/material.dart';
@@ -15,25 +17,39 @@ class _AuthFormState extends State<AuthForm> {
   final GlobalKey<FormState> _formKey = GlobalKey();
   final AuthData _authData = AuthData();
 
-  _submit() {
+  void _submit() {
     bool isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
+
+    if (_authData.image == null && _authData.isSignup) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('User image required!'),
+          backgroundColor: Theme.of(context).errorColor,
+        ),
+      );
+      return;
+    }
 
     if (isValid) {
       widget.onSubmit(_authData);
     }
   }
 
+  void _handlePickedImage(File image) {
+    _authData.image = image;
+  }
+
   List<Widget> _createUserFields() {
     return [
-      UserImagePicker(),
+      UserImagePicker(_handlePickedImage),
       TextFormField(
         key: ValueKey('name'),
-        initialValue: _authData.getName,
+        initialValue: _authData.name,
         decoration: InputDecoration(
           labelText: 'Nome',
         ),
-        onChanged: (String? value) => _authData.setName = value,
+        onChanged: (String? value) => _authData.name = value,
         validator: (value) {
           if (value == '') {
             return 'Name can\'t be null';
@@ -62,7 +78,7 @@ class _AuthFormState extends State<AuthForm> {
                     decoration: InputDecoration(
                       labelText: 'Email',
                     ),
-                    onChanged: (String? value) => _authData.setEmail = value,
+                    onChanged: (String? value) => _authData.email = value,
                     validator: (value) {
                       if (value == null || !value.contains('@')) {
                         return 'Email can\'t be null or not valid';
@@ -76,7 +92,7 @@ class _AuthFormState extends State<AuthForm> {
                     decoration: InputDecoration(
                       labelText: 'Senha',
                     ),
-                    onChanged: (String? value) => _authData.setPassword = value,
+                    onChanged: (String? value) => _authData.password = value,
                     validator: (value) {
                       if (value == null || value.trim().length < 7) {
                         return 'Password can\'t have less than 7 characters';

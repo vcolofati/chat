@@ -2,6 +2,7 @@ import 'package:chat/models/auth_data.dart';
 import 'package:chat/widgets/auth_form.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -23,25 +24,27 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       if (authData.isLogin) {
         userCredential = await _auth.signInWithEmailAndPassword(
-          email: authData.getEmail!.trim(),
-          password: authData.getPassword!,
+          email: authData.email!.trim(),
+          password: authData.password!,
         );
       } else {
         userCredential = await _auth.createUserWithEmailAndPassword(
-          email: authData.getEmail!.trim(),
-          password: authData.getPassword!,
+          email: authData.email!.trim(),
+          password: authData.password!,
         );
-        userCredential.user?.updateProfile(displayName: authData.getName);
 
-        final userData = {
-          'name': authData.getName,
-          'email': authData.getEmail,
-        };
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_images')
+            .child('${userCredential.user?.uid}.jpg');
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user?.uid)
-            .set(userData);
+        ref.putFile(authData.image!);
+        final String url = await ref.getDownloadURL();
+
+        userCredential.user?.updateProfile(
+          displayName: authData.name,
+          photoURL: url,
+        );
       }
     } on FirebaseAuthException catch (err) {
       final msg = err.message ?? 'Occurred an error. Check your credentials!';
@@ -65,27 +68,29 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              children: [
-                AuthForm(_handleSubmit),
-                if (_isLoading)
-                  Positioned.fill(
-                    child: Container(
-                      margin: const EdgeInsets.all(20),
-                      decoration: const BoxDecoration(
-                        color: Color.fromRGBO(0, 0, 0, 0.5),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  AuthForm(_handleSubmit),
+                  if (_isLoading)
+                    Positioned.fill(
+                      child: Container(
+                        margin: const EdgeInsets.all(20),
+                        decoration: const BoxDecoration(
+                          color: Color.fromRGBO(0, 0, 0, 0.5),
+                        ),
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
                       ),
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  )
-              ],
-            ),
-          ],
+                    )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
