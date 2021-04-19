@@ -1,5 +1,6 @@
 import 'package:chat/models/auth_data.dart';
 import 'package:chat/widgets/auth_form.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +15,11 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
 
   Future<void> _handleSubmit(AuthData authData) async {
-    setState(() {
-      _isLoading = true;
-    });
+    if (this.mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
 
     UserCredential userCredential;
 
@@ -37,17 +40,12 @@ class _AuthScreenState extends State<AuthScreen> {
             .child('user_images')
             .child('${userCredential.user?.uid}.jpg');
 
-        final metadata = SettableMetadata(
-          contentType: 'image/jpeg',
-        );
+        await ref.putFile(authData.image!);
 
-        ref.putFile(authData.image!, metadata);
         final String url = await ref.getDownloadURL();
 
-        userCredential.user?.updateProfile(
-          displayName: authData.name,
-          photoURL: url,
-        );
+        userCredential.user
+            ?.updateProfile(displayName: authData.name, photoURL: url);
       }
     } on FirebaseAuthException catch (err) {
       final msg = err.message ?? 'Occurred an error. Check your credentials!';
@@ -60,9 +58,11 @@ class _AuthScreenState extends State<AuthScreen> {
     } catch (err) {
       print(err);
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (this.mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 

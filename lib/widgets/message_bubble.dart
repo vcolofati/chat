@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 
 class MessageBubble extends StatelessWidget {
   final Key? key;
-  final String userName;
   final String message;
   final bool belongsToMe;
 
-  MessageBubble(this.message, this.userName, this.belongsToMe, {this.key})
-      : super(key: key);
+  MessageBubble(this.message, this.belongsToMe, {this.key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,15 +18,17 @@ class MessageBubble extends StatelessWidget {
             color:
                 belongsToMe ? Colors.grey[300] : Theme.of(context).accentColor,
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-              bottomLeft:
-                  belongsToMe ? Radius.circular(12) : Radius.circular(0),
-              bottomRight:
-                  belongsToMe ? Radius.circular(0) : Radius.circular(12),
+              topLeft: const Radius.circular(12),
+              topRight: const Radius.circular(12),
+              bottomLeft: belongsToMe
+                  ? const Radius.circular(12)
+                  : const Radius.circular(0),
+              bottomRight: belongsToMe
+                  ? const Radius.circular(0)
+                  : const Radius.circular(12),
             ),
           ),
-          width: 140,
+          width: 250,
           margin: const EdgeInsets.symmetric(
             vertical: 4,
             horizontal: 8,
@@ -41,15 +41,6 @@ class MessageBubble extends StatelessWidget {
             crossAxisAlignment:
                 belongsToMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
-              Text(
-                userName,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: belongsToMe
-                      ? Colors.black
-                      : Theme.of(context).accentTextTheme.headline1?.color,
-                ),
-              ),
               Text(
                 message,
                 style: TextStyle(
