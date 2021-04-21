@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MessageBubble extends StatelessWidget {
   final Key? key;
   final String message;
+  final DateTime hour;
   final bool belongsToMe;
 
-  MessageBubble(this.message, this.belongsToMe, {this.key}) : super(key: key);
+  MessageBubble(this.message, this.hour, this.belongsToMe, {this.key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,19 +40,26 @@ class MessageBubble extends StatelessWidget {
             vertical: 10,
             horizontal: 16,
           ),
-          child: Column(
-            crossAxisAlignment:
-                belongsToMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                message,
-                style: TextStyle(
-                  color: belongsToMe
-                      ? Colors.black
-                      : Theme.of(context).accentTextTheme.headline1?.color,
+              Flexible(
+                child: Text(
+                  message,
+                  style: TextStyle(
+                    color: belongsToMe
+                        ? Colors.black
+                        : Theme.of(context).accentTextTheme.headline1?.color,
+                  ),
+                  textAlign: TextAlign.start,
                 ),
-                textAlign: belongsToMe ? TextAlign.end : TextAlign.start,
               ),
+              Text(
+                DateFormat('HH:mm').format(hour),
+                style: TextStyle(
+                  color: belongsToMe ? Colors.grey : Colors.amber,
+                ),
+              )
             ],
           ),
         )

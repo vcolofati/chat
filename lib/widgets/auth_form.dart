@@ -81,7 +81,7 @@ class _AuthFormState extends State<AuthForm> {
                     onChanged: (String? value) => _authData.email = value,
                     validator: (value) {
                       if (value == null || !value.contains('@')) {
-                        return 'Email can\'t be null or not valid';
+                        return 'E-mail nulo ou não válido';
                       }
                       return null;
                     },
@@ -95,7 +95,7 @@ class _AuthFormState extends State<AuthForm> {
                     onChanged: (String? value) => _authData.password = value,
                     validator: (value) {
                       if (value == null || value.trim().length < 7) {
-                        return 'Password can\'t have less than 7 characters';
+                        return 'Senha nula ou com menos de 7 caracteres';
                       }
                       return null;
                     },
@@ -106,7 +106,9 @@ class _AuthFormState extends State<AuthForm> {
                     onPressed: _submit,
                   ),
                   TextButton(
-                    child: Text(_authData.isLogin ? 'Signup' : 'Signin'),
+                    child: Text(_authData.isLogin
+                        ? 'Não possui uma conta?'
+                        : 'Já tem uma conta?'),
                     onPressed: () {
                       setState(() {
                         _authData.toggleMode();

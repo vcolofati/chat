@@ -33,7 +33,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
         });
         widget.onImagePick(_image!);
       } else {
-        print('No image selected');
+        print('Nenhuma imagem selecionada');
       }
     } on PlatformException catch (err) {
       ScaffoldMessenger.of(context)

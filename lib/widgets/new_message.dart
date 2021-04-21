@@ -3,6 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NewMessage extends StatefulWidget {
+  final CollectionReference chat;
+  final User user;
+
+  NewMessage(this.chat, this.user);
+
   @override
   _NewMessageState createState() => _NewMessageState();
 }
@@ -20,20 +25,15 @@ class _NewMessageState extends State<NewMessage> {
 
   void _sendMessage() async {
     FocusScope.of(context).unfocus();
-    final user = FirebaseAuth.instance.currentUser;
-    // final userData = await FirebaseFirestore.instance
-    //     .collection('users')
-    //     .doc(user?.uid)
-    //     .get();
-    FirebaseFirestore.instance.collection('chat').add({
+
+    widget.chat.add({
       'text': _enteredMessage,
       'createdAt': Timestamp.now(),
-      'userId': user?.uid,
-      'userName': user?.displayName,
-      'userImageUrl': user?.photoURL
+      'userId': widget.user.uid,
     });
 
     _controller.clear();
+    _enteredMessage = '';
   }
 
   @override
@@ -44,7 +44,8 @@ class _NewMessageState extends State<NewMessage> {
           Expanded(
             child: TextField(
               controller: _controller,
-              decoration: InputDecoration(labelText: 'Enviar mensagem...'),
+              decoration:
+                  const InputDecoration(labelText: 'Enviar mensagem...'),
               onChanged: (value) {
                 setState(() {
                   _enteredMessage = value;
@@ -53,7 +54,7 @@ class _NewMessageState extends State<NewMessage> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.send),
+            icon: const Icon(Icons.send),
             onPressed: _enteredMessage.trim().isEmpty ? null : _sendMessage,
           ),
         ],

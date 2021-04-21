@@ -4,12 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Messages extends StatelessWidget {
+  final CollectionReference chat;
+  final User user;
+
+  Messages(this.chat, this.user);
+
   @override
   Widget build(BuildContext context) {
-    User? user = FirebaseAuth.instance.currentUser;
-    CollectionReference chats = FirebaseFirestore.instance.collection('chat');
     return StreamBuilder<QuerySnapshot>(
-      stream: chats.orderBy('createdAt', descending: true).snapshots(),
+      stream: chat.orderBy('createdAt', descending: true).snapshots(),
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -22,7 +25,8 @@ class Messages extends StatelessWidget {
           itemCount: chatDocs?.length,
           itemBuilder: (ctx, i) => MessageBubble(
             chatDocs?[i].get('text'),
-            chatDocs?[i].get('userId') == user?.uid,
+            chatDocs?[i].get('createdAt').toDate(),
+            chatDocs?[i].get('userId') == user.uid,
             key: ValueKey(chatDocs?[i].id),
           ),
         );

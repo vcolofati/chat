@@ -1,5 +1,6 @@
 import 'package:chat/models/auth_data.dart';
 import 'package:chat/widgets/auth_form.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -11,7 +12,6 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final _auth = FirebaseAuth.instance;
   bool _isLoading = false;
 
   Future<void> _handleSubmit(AuthData authData) async {
@@ -21,16 +21,18 @@ class _AuthScreenState extends State<AuthScreen> {
       });
     }
 
+    final auth = FirebaseAuth.instance;
+    final users = FirebaseFirestore.instance.collection('users');
     UserCredential userCredential;
 
     try {
       if (authData.isLogin) {
-        userCredential = await _auth.signInWithEmailAndPassword(
+        userCredential = await auth.signInWithEmailAndPassword(
           email: authData.email!.trim(),
           password: authData.password!,
         );
       } else {
-        userCredential = await _auth.createUserWithEmailAndPassword(
+        userCredential = await auth.createUserWithEmailAndPassword(
           email: authData.email!.trim(),
           password: authData.password!,
         );
@@ -44,11 +46,16 @@ class _AuthScreenState extends State<AuthScreen> {
 
         final String url = await ref.getDownloadURL();
 
-        userCredential.user
-            ?.updateProfile(displayName: authData.name, photoURL: url);
+        final userData = {
+          'name': authData.name,
+          'email': authData.email,
+          'imageUrl': url,
+        };
+
+        await users.doc(userCredential.user?.uid).set(userData);
       }
     } on FirebaseAuthException catch (err) {
-      final msg = err.message ?? 'Occurred an error. Check your credentials!';
+      final msg = err.message ?? 'Ocorreu um erro. Verifique suas credenciais!';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(msg),
